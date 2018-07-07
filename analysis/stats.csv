@@ -1,0 +1,136 @@
+project,path,presence_condition,alg_one_enabled,alg_one_disabled,alg_all_enabled_disabled,alg_pair_wise
+apache,server/mpm_common.c,AP_MPM_USES_POD,1,1,1,1
+apache,modules/experimental/util_ldap_cache.c,APR_HAS_SHARED_MEMORY,1,1,1,1
+apache,os/unix/unixd.c,APR_HAS_SYSVSEM_SERIALIZE,1,1,1,1
+apache,modules/ssl/ssl_util.c,APR_HAS_THREADS,1,1,1,1
+apache,server/listen.c,APR_HAVE_IPV6,1,1,1,1
+apache,server/mpm/prefork/prefork.c,GPROF,1,1,1,1
+apache,modules/filters/mod_include.c,NETWARE,1,1,1,1
+apache,support/ab.c,NOT_ASCII,1,1,1,1
+apache,server/mpm/winnt/mpm_winnt.c,WIN32,1,1,1,1
+apache,modules/slotmem/mod_slotmem_shm.c,(AP_NEED_SET_MUTEX_PERMS && APR_USE_SHMEM_SHMGET)||(AP_NEED_SET_MUTEX_PERMS && APR_USE_SHMEM_SHMGET_ANON),0,1,1,1
+apache,server/mpm/winnt/mpm_winnt.c,WIN32 && !AP_ENABLE_V4_MAPPED,1,1,0,1
+apache,os/win32/ap_regkey.c,WIN32 && !APR_HAS_UNICODE_FS && !APR_HAS_ANSI_FS,1,0,0,1
+bash,support/getcppsyms.c,plexus,1,1,1,1
+bash,execute_cmd.c,(DPAREN_ARITHMETIC && !COND_COMMAND)||(ARITH_FOR_COMMAND && !COND_COMMAND),1,1,0,1
+bison,data/push.c,YYERROR_VERBOSE,1,1,1,1
+bison,data/push.c,yyoverflow,1,1,1,1
+busybox,libbb/verror_msg.c,!ENABLE_FEATURE_SYSLOG,1,1,1,1
+busybox,miscutils/nandwrite.c,(!ENABLE_FEATURE_TAR_LONG_OPTIONS) || (!ENABLE_FEATURE_GETOPT_LONG),1,1,1,1
+busybox,util-linux/mdev.c,CONFIG_MDEV && !CONFIG_FEATURE_MDEV_CONF,1,1,0,1
+busybox,shell/hush.c,ENABLE_FEATURE_EDITING && (!ENABLE_HUSH_INTERACTIVE),1,1,0,1
+busybox,miscutils/less.c,ENABLE_FEATURE_LESS_WINCH && !ENABLE_FEATURE_LESS_REGEXP,1,1,0,1
+busybox,archival/tar.c,ENABLE_FEATURE_GETOPT_LONG && !ENABLE_FEATURE_SEAMLESS_LZMA && !ENABLE_FEATURE_TAR_LONG_OPTIONS,1,0,0,1
+busybox,networking/nc.c,ENABLE_NC && !ENABLE_NC_110_COMPAT && !ENABLE_NC_EXTRA,1,0,0,1
+busybox,networking/httpd.c,ENABLE_FEATURE_HTTPD_USE_SENDFILE && ENABLE_FEATURE_HTTPD_BASIC_AUTH && !ENABLE_FEATURE_HTTPD_AUTH_MD5 && !PIPE_BUF,0,0,0,1
+busybox,shell/hush.c,ENABLE_HUSH_CASE && ENABLE_FEATURE_EDITING_SAVE_ON_EXIT && ENABLE_HUSH_INTERACTIVE && !ENABLE_FEATURE_EDITING,0,1,0,0
+busybox,networking/ftpd.c,CONFIG_FTPD && ENABLE_FEATURE_FTP_AUTHENTICATION && !CONFIG_SU && !CONFIG_VLOCK && !CONFIG_LOGIN && !CONFIG_SULOGIN,0,0,0,1
+cherokee,cherokee/access.c,AF_INET6,1,1,1,1
+cherokee,cherokee/main.c,HAVE_POSIX_SHM,1,1,1,1
+cherokee,cherokee/thread.c,HAVE_PTHREAD,1,1,1,1
+cvs,src/buffer.c,(SHUTDOWN_SERVER && NO_SOCKET_TO_FD && START_RSH_WITH_POPEN_RW)||(!SHUTDOWN_SERVER && NO_SOCKET_TO_FD && START_RSH_WITH_POPEN_RW),0,1,1,1
+dia,lib/prop_text.c,(GTK_DOESNT_TALK_UTF8_WE_DO) || (GTK_TALKS_UTF8_WE_DONT),1,1,1,1
+dia,app/preferences.c,SCROLLED_PAGES,1,1,1,1
+dia,app/app_procs.c,!GNOME && HAVE_POPT,1,1,0,1
+firefox,libjar/nsJAR.cpp,ZIP_CACHE_HIT_RATE && !XP_UNIX,1,1,0,1
+firefox,zlib/gzread.c,!Z_PREFIX_SET,0,1,1,1
+fvwm,fvwm/virtual.c,!NO_REMEMBER_FOCUS,1,1,1,1
+fvwm,modules/FvwmWharf/FvwmWharf.c,ENABLE_SOUND,1,1,1,1
+fvwm,modules/FvwmWharf/FvwmWharf.c,ENABLE_SOUND,1,1,1,1
+fvwm,fvwm/events.c,EXPERIMENTAL_ANTI_RACE_CONDITION_CODE,1,1,1,1
+fvwm,fvwm/ewmh_icons.c,HAVE_EWMH,1,0,1,1
+fvwm,libs/FlocaleCharset.c,HAVE_XOUTPUT_METHOD,1,1,1,1
+fvwm,fvwm/style.c,MINI_ICONS,1,1,1,1
+fvwm,fvwm/builtins.c,MINI_ICONS,1,1,1,1
+fvwm,modules/FvwmButtons/FvwmButtons.c,SHAPE,1,1,1,1
+fvwm,fvwm/icons.c,XPM,1,1,1,1
+gcc,gcc/asan.c,ASM_OUTPUT_DEF,1,0,1,1
+gcc,gcc/combine-stack-adj.c,!PUSH_ROUNDING,0,1,1,1
+gcc,gcc/cse.c,HAVE_cc0 && FLOAT_STORE_FLAG_VALUE,0,1,1,1
+gnome-keyring,common/gkr-location.c,!WITH_TESTS,1,1,1,1
+gnome-vfs,modules/http-proxy.c,!ENABLE_IPV6,1,1,1,1
+gnuplot,src/graph3d.c,!PM3D,1,1,1,1
+gnuplot,src/graphics.c,GP_ENH_EST,1,1,1,1
+gnuplot,src/eval.c,GP_STRING_VARS,1,1,1,1
+gnuplot,src/mouse.c,GP_STRING_VARS,1,1,1,1
+gnuplot,src/parse.c,lint,1,1,1,1
+gnuplot,src/gplt_x11.c,USE_MOUSE,1,1,1,1
+gnuplot,src/wxterminal/gp_cairo.c,WITH_IMAGE,1,1,1,1
+gnuplot,src/datafile.c,!WITH_IMAGE && EAM_OBJECTS,1,1,0,1
+gnuplot,src/util.c,VA_START && ANSI_C,0,1,1,1
+gnuplot,src/plot.c,VMS && !ATARI && !MTOS,1,0,0,1
+irssi,src/core/recode.c,HAVE_GLIB2,1,0,1,1
+irssi,src/core/recode.c,HAVE_GLIB2,1,0,1,1
+irssi,src/core/modules-load.c,HAVE_GMODULE,1,0,1,1
+irssi,src/core/modules.c,HAVE_GMODULE,1,0,1,1
+libpng,contrib/libtests/pngvalid.c,!PNG_READ_INTERLACING_SUPPORTED,1,1,1,1
+libpng,pngtrans.c,PNG_USELESS_TESTS_SUPPORTED,1,1,1,1
+libpng,pngrutil.c,PNG_READ_sPLT_SUPPORTED && !PNG_POINTER_INDEXING_SUPPORTED,1,1,0,1
+libpng,pngtest.c,PNG_WRITE_SUPPORTED && PNG_WRITE_FLUSH_SUPPORTED,0,1,1,1
+libssh,src/options.c,!_MSC_VER,1,1,1,1
+libssh,libssh/keys.c,!_WIN32,1,1,1,1
+libssh,libssh/auth.c,!_WIN32,1,1,1,1
+libssh,src/pki_crypto.c,HAVE_OPENSSL_ECC,1,1,1,1
+libssh,src/pki.c,WITH_SERVER,1,1,1,1
+libssh,src/messages.c,WITH_SERVER,1,1,1,1
+libssh,src/messages.c,WITH_SERVER,1,1,1,1
+libssh,libssh/options.c,WITH_SERVER,1,1,1,1
+libssh,src/channels.c,WITH_SSH1,1,1,1,1
+libssh,libssh/kex.c,WITH_SSH1,1,1,1,1
+libssh,src/dh.c,!HAVE_LIBGCRYPT && !HAVE_LIBCRYPTO,1,0,1,1
+libssh,src/keys.c,!HAVE_LIBGCRYPT && !HAVE_LIBCRYPTO,1,0,1,1
+libssh,src/keys.c,!HAVE_LIBGCRYPT && !HAVE_LIBCRYPTO,1,0,1,1
+libssh,src/keyfiles.c,!HAVE_LIBGCRYPT && !HAVE_LIBCRYPTO,1,0,1,1
+libssh,src/keyfiles.c,!HAVE_LIBGCRYPT && !HAVE_LIBCRYPTO,1,0,1,1
+libssh,src/known_hosts.c,!HAVE_LIBGCRYPT && !HAVE_LIBCRYPTO,1,0,1,1
+libssh,src/client.c,!HAVE_LIBGCRYPT && !HAVE_LIBCRYPTO,1,0,1,1
+libxml2,xmlregexp.c,DEBUG_REGEXP_GRAPH,1,1,1,1
+libxml2,xpath.c,WIN32,1,1,1,1
+lighttpd,src/condition.c,HAVE_PCRE_H,1,1,1,1
+linux,include/linux/kernel.h,!CONFIG_TRACING,1,1,1,1
+linux,include/linux/if_vlan.h,!CONFIG_VLAN_8021Q,1,1,1,1
+linux,drivers/base/core.c,!HOTPLUG,1,1,1,1
+linux,fs/reiserfs/namei.c,!SECURITY,1,1,1,1
+linux,arch/arm/mm/fault.c,CONFIG_ARM_LPAE,1,1,1,1
+linux,kernel/sched/proc.c,CONFIG_NO_HZ_COMMON,1,1,1,1
+linux,include/net/inet_hashtables.h,CONFIG_NUMA,1,1,1,1
+linux,fs/proc/task_mmu.c,CONFIG_PROC_PAGE_MONITOR,1,1,1,1
+linux,fs/quota/dquot.c,CONFIG_QUOTA_DEBUG,1,1,1,1
+linux,kernel/sched/rt.c,CONFIG_SCHED_DEBUG,1,1,1,1
+linux,net/ipv4/udp.c,HIGHMEM,1,1,1,1
+linux,fs/jffs2/super.c,JFFS2_FS_WBUF_VERIFY,1,1,1,1
+linux,kernel/time/tick-sched.c,!A64BIT && !KTIME_SCALAR,1,0,1,1
+linux,arch/arm/mach-omap2/board-omap3pandora.c,ARCH_OPAM3 && !PM,1,1,0,1
+linux,block/cfq-iosched.c,CONFIG_CFQ_GROUP_IOSCHED && !CONFIG_DEBUG_BLK_CGROUP,1,1,0,1
+linux,kernel/module.c,CONFIG_MODULE_UNLOAD && CONFIG_SMP,0,1,1,1
+linux,arch/blackfin/mach-common/pm.c,CONFIG_PM_BFIN_SLEEP_DEEPER && CONFIG_BF60x,0,1,1,1
+linux,net/ipv4/tcp_minisocks.c,CONFIG_TCP_MD5SIG && PREEMPT,0,1,1,1
+linux,drivers/tty/pty.c,CONFIG_UNIX98_PTYS && DEVPTS_MULTIPLE_INSTANCES,0,1,1,1
+linux,init/main.c,CONFIG_X86 && ACPI_WMI,0,1,1,1
+linux,arch/x86/kernel/smpboot.c,CONFIG_X86_32 && CONFIG_X86_BIGSMP,0,1,1,1
+linux,drivers/net/arm/ep93xx_eth.c,EP93XX_ETH && !ZONE_DMA,1,1,0,1
+linux,drivers/extcon/extcon-class.c,EXTCON && SYSFS && CONFIG_ANDROID,0,0,1,1
+linux,drivers/infiniband/hw/ocrdma/ocrdma_main.c,IS_ENABLEDCONFIG_IPV6 && !IS_ENABLEDCONFIG_VLAN_8021Q,1,1,0,1
+linux,arch/arm/mach-omap2/board-generic.c,MACH_OMAP_H4 && !ARCH_OMAP2420,1,1,0,1
+linux,net/core/netpoll.c,NETPOLL && !IS_ENABLEDCONFIG_IPV6,1,1,0,1
+linux,arch/s390/crypto/prng.c,S390 && S390_PRNG,0,0,1,1
+linux,drivers/net/3c59x.c,VORTEX_DEBUG && !CONFIG_PCI,1,1,0,1
+linux,arch/x86/pci/common.c,__i386__ && CONFIG_NUMA && CONFIG_PCI_BIOS,0,1,1,1
+linux,arch/parisc/mm/init.c,CONFIG_PARISC_PAGE_SIZE_4KB && CONFIG_DISCONTIGMEM && PROC_PAGE_MONITOR,0,1,1,0
+linux,kernel/rcutree_plugin.h,CONFIG_TREE_PREEMPT_RCU && CONFIG_RCU_CPU_STALL_INFO && !CONFIG_RCU_FAST_NO_HZ,0,1,0,0
+linux,drivers/gpu/drm/i915/i915_dma.c,DRM_I915 && SHMEM && !TMPFS,0,1,0,1
+linux,net/sctp/ipv6.c,IP_SCTP && IPV6 && SCTP_DBG_MSG,0,1,1,0
+linux,drivers/base/dd.c,I2C && TWL4030_CORE && IRQ_DOMAIN && !OF_IRQ,0,1,0,0
+linux,arch/powerpc/kernel/kprobes.c,!CONFIG_PPC64 && KPROBES && !KGDB && !XMON && !BDI_SWITCH,1,0,0,0
+linux,init/main.c,CONFIG_DEBUG_SLAB && CONFIG_LOCKDEP && TRACE_IRQFLAGS && PROVE_LOCKING && CONFIG_NUMA,0,1,1,0
+linux,mm/slab.c,CONFIG_LOCKDEP && CONFIG_DEBUG_SLAB && !CONFIG_DEBUG_SLAB_LEAK && PPC_256K_PAGES && FORCE_MAX_ZONEORDER,0,1,0,0
+lua,src/loadlib_rel.c,!__CYGWIN__ && !_WIN32 && !__linux__ && !__sun && !__FreeBSD__ && !__BSD__ && !__APPLE__,1,0,1,0
+totem,src/totem.c,HAVE_GTK_ONLY,1,1,1,1
+vim,src/ex_cmds.c,WIN32,1,1,1,1
+vim,src/os_unix.c,(FEAT_MOUSE_DEC &&  FEAT_MOUSE_GPM)||(FEAT_MOUSE_JSB && FEAT_MOUSE_PTERM),0,1,1,1
+vim,src/memfile.c,!AMIGA && !UNIX && !MSDOS,1,0,1,1
+vim,src/netbeans.c,!FEAT_GUI_W32 && !PROTO && !FEAT_GUI_MOTIF && !FEAT_GUI_GTK,1,0,1,1
+vim,src/if_mzsch.c, !FEAT_GUI_W32 && !FEAT_GUI_GTK && !FEAT_GUI_MOTIF && !FEAT_GUI_ATHENA && !FEAT_GUI_MAC && FEAT_GUI,1,0,0,0
+xfig,w_cmdpanel.c,FIXED_JAPANESE_PDF,1,1,1,1
+xterm,main.c,!USE_USG_PTYS && USE_ISPTS_FLAG,1,1,0,1
+xterm,main.c,(__GLIBC__ && USE_ISPTS_FLAG)||(__MVS__ && USE_ISPTS_FLAG),0,1,1,1

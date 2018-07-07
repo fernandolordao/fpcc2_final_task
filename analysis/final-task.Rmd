@@ -1,0 +1,555 @@
+---
+title: "final-task"
+author: "Fernando Lordao"
+date: "7 de julho de 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r General Configuration}
+set.seed(20180707)
+```
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(chron)
+library(boot)
+theme_set(theme_bw())
+```
+
+## Descrição geral
+
+Vamos explorar os dados do artigo "A Comparison of 10 Sampling Algorithms for Configurable Systems".
+
+
+## Carga dos dados
+
+```{r ETL}
+bugs = read_csv("stats.csv")
+```
+
+```{r}
+bugs %>% 
+  select(alg_one_enabled, alg_one_disabled, alg_all_enabled_disabled, alg_pair_wise) %>% 
+  summarize(alg_one_enabled = sum(alg_one_enabled),
+            alg_one_disabled = sum(alg_one_disabled),
+            alg_all_enabled_disabled = sum(alg_all_enabled_disabled),
+            alg_pair_wise = sum(alg_pair_wise)) %>% 
+  t() %>% 
+  ggplot(aes(x=))
+```
+
+
+## Analisando a média de taxa de cliques diária geral (sem distinção de grupos)
+
+```{r}
+funcao_bootstrap_q1_global <- function(data, indexes){
+  daily_rate = data %>% 
+    slice(indexes) %>% 
+    group_by(date_week) %>% 
+    summarize(
+      clickthroughrate = (sum(click_count>0) / sum(click_count>=0)) * 100
+    )
+  return(
+    mean(daily_rate$clickthroughrate)
+  )
+}
+
+events_q1b = events %>% 
+    group_by(date_week, session_id, search_index) %>% 
+    mutate(click_count = max(visit_index)) %>% 
+    subset(action == "searchResultPage", select = c("date_week", "click_count"))
+
+
+bootstraps_q1 <- boot(data = events_q1b, 
+                   statistic = funcao_bootstrap_q1_global, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q1$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q1$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q1$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q1$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q1, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que a taxa de cliques da população está entre 29,10% e 29,77%.
+
+## Analisando a média de taxa de cliques diária geral (do grupo A)
+
+```{r}
+events_q1ba = events %>% 
+    filter(group == "a") %>% 
+    group_by(date_week, session_id, search_index) %>% 
+    mutate(click_count = max(visit_index)) %>% 
+    subset(action == "searchResultPage", select = c("date_week", "click_count"))
+
+
+bootstraps_q1 <- boot(data = events_q1ba, 
+                   statistic = funcao_bootstrap_q1_global, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q1$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q1$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q1$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q1$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q1, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que a taxa de cliques no grupo A da população está entre 28,46% e 29,06%.
+
+
+## Analisando a média de taxa de cliques diária geral (do grupo B)
+
+```{r}
+events_q1bb = events %>% 
+    filter(group == "b") %>% 
+    group_by(date_week, session_id, search_index) %>% 
+    mutate(click_count = max(visit_index)) %>% 
+    subset(action == "searchResultPage", select = c("date_week", "click_count"))
+
+
+bootstraps_q1 <- boot(data = events_q1bb, 
+                   statistic = funcao_bootstrap_q1_global, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q1$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q1$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q1$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q1$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q1, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que a taxa de cliques no grupo A da população está entre 14,72% e 15,36%.
+
+
+## Analisando a diferença da média de taxa de cliques diária entre o grupo A e o grupo B
+
+```{r}
+events_q1bdif = events %>% 
+    group_by(group, date_week, session_id, search_index) %>% 
+    mutate(click_count = max(visit_index)) %>% 
+    subset(action == "searchResultPage", select = c("group", "date_week", "click_count"))
+
+funcao_bootstrap_q1_dif <- function(data, indexes){
+  daily_rate = data %>% 
+    slice(indexes) %>% 
+    group_by(group, date_week) %>% 
+    summarize(
+      clickthroughrate = (sum(click_count>0) / sum(click_count>=0)) * 100
+    )
+  mean_rate_a = daily_rate %>% 
+    filter(group == "a") %>% 
+    summarize(
+      meanrate = mean(clickthroughrate)
+    ) %>% 
+    pull (meanrate)
+    
+  mean_rate_b = daily_rate %>% 
+    filter(group == "b") %>% 
+    summarize(
+      meanrate = mean(clickthroughrate)
+    ) %>% 
+    pull (meanrate)
+  
+  return(
+    mean(mean_rate_a - mean_rate_b)
+  )
+}
+
+bootstraps_q1 <- boot(data = events_q1bdif, 
+                   statistic = funcao_bootstrap_q1_dif, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q1$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q1$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q1$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q1$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q1, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que a média da taxa de cliques diária no grupo A está acima da taxa média do grupo B num valor entre 13,28 e 14,18 pontos percentuais.
+
+
+## PERGUNTA 2:
+## Quais resultados os usuários tendem a clicar primeiro? Como isso muda dia após dia?
+
+Análise original.
+
+```{r Ploting data to answer question 2}
+events_q2 = events %>% 
+    filter(visit_index == 1 & action == "visitPage" & !is.na(result_position))
+
+events_q2 %>% 
+    ggplot(aes(x = date_week, y = result_position)) +
+    geom_jitter(alpha = 0.05) +
+    labs(x = "Dias", y = "Posição do resultado clicado", title = "Posição do primeiro clique por dia") +
+    scale_y_log10() +
+    theme(axis.text.x = element_text(angle=60, hjust=1))
+
+events_q2 %>%
+    filter(result_position < 1000) %>% 
+    ggplot(aes(x = result_position)) +
+    geom_histogram(binwidth = 1, fill = "white", color = "blue", show.legend = TRUE) +
+    labs(x = "Posição do resultado clicado", title = "Posição do primeiro clique por dia") +
+    scale_y_log10()
+    
+```
+
+    
+## Analisando a média de taxa de cliques diária geral
+
+```{r}
+funcao_bootstrap_q2_global <- function(data, indexes){
+  daily_data = data %>% 
+    slice(indexes) %>% 
+    group_by(date_week) %>% 
+    summarize(
+      mean_position = mean(result_position)
+    )
+  return(
+    mean(daily_data$mean_position)
+  )
+}
+
+events_q2b = events_q2 %>%
+    subset(select = c("date_week", "result_position"))
+
+
+bootstraps_q2b <- boot(data = events_q2b, 
+                   statistic = funcao_bootstrap_q2_global, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q2b$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q2b$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q2b$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q2b$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q2b, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que os usários tendem a clicar nos resulados que estão entre as posições 3,173 e 4,124.
+
+
+## PERGUNTA 3:
+## Qual a nossa taxa geral de pesquisas sem resultados diariamente? Como isso varia entre os grupos?
+
+Para responder esta questão precisamos contar a quantidade eventos do tipo "searchResultPage" cuja coluna *n_result* é zero e dividir pela quantidade total de eventos desse mesmo tipo.
+
+O gráfico que segue é bem semelhante ao gráfico plotado na questão 1, só muda a informação que estamos medindo, que aqui é a taxa de resultados nulos, por assim dizer.
+
+```{r Preparing data to answer question 3}
+events_q3 = events %>%
+    group_by(group, date_week) %>% 
+    summarise(
+        zero_count = sum(action == "searchResultPage" & n_results == 0),
+        tot_count = sum(action == "searchResultPage"),
+        zerorate = zero_count/tot_count*100
+    )
+
+events_q3 %>% 
+    ggplot(aes(x = date_week, y = zerorate, fill = group)) +
+    geom_col(position = "dodge") +
+    labs(x = "Dias", y = "Taxa de resultados nulos (%)", fill = "Grupos", title = "Taxa de pesquisas sem resultado por dia e por grupo") +
+    theme(axis.text.x = element_text(angle=60, hjust=1))
+    
+```
+
+## Analisando a média de taxa de pesquisas sem resultado geral (sem distinção de grupos)
+
+```{r}
+funcao_bootstrap_q3_global <- function(data, indexes){
+  daily_rate = data %>% 
+    slice(indexes) %>% 
+    group_by(date_week) %>% 
+    summarize(
+      zero_rate = (sum(n_results==0) / sum(n_results>=0)) * 100
+    )
+  return(
+    mean(daily_rate$zero_rate)
+  )
+}
+
+events_q3b = events %>% 
+    group_by(date_week, session_id, search_index) %>% 
+    subset(action == "searchResultPage", select = c("date_week", "n_results"))
+
+
+bootstraps_q3 <- boot(data = events_q3b, 
+                   statistic = funcao_bootstrap_q3_global, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q3$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q3$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q3$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q3$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q3, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que a taxa de pesquisas sem resultado está entre 18,40% e 18,83%.
+
+## Analisando a média de taxa de pesquisas sem resultados diária geral (do grupo A)
+
+```{r}
+events_q3ba = events %>% 
+    filter(group == "a") %>% 
+    group_by(date_week, session_id, search_index) %>% 
+    subset(action == "searchResultPage", select = c("date_week", "n_results"))
+
+
+bootstraps_q3 <- boot(data = events_q3ba, 
+                   statistic = funcao_bootstrap_q3_global, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q3$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q3$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q3$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q3$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q3, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que a taxa de pesquisas sem resultado no grupo A da população está entre 18,28% e 18,82%.
+
+
+## Analisando a média de taxa de pesquisas sem resultado diária geral (do grupo B)
+
+```{r}
+events_q3bb = events %>% 
+    filter(group == "b") %>% 
+    group_by(date_week, session_id, search_index) %>% 
+    subset(action == "searchResultPage", select = c("date_week", "n_results"))
+
+
+bootstraps_q3 <- boot(data = events_q3bb, 
+                   statistic = funcao_bootstrap_q3_global, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q3$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q3$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q3$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q3$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q3, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que a taxa de pesquisas sem resultado no grupo B da população está entre 18,35% e 19,12%.
+
+
+## Analisando a diferença da média de taxa de pesquisas sem resultado diária entre o grupo A e o grupo B
+
+```{r}
+events_q3bdif = events %>% 
+    group_by(group, date_week, session_id, search_index) %>% 
+    subset(action == "searchResultPage", select = c("group", "date_week", "n_results"))
+
+funcao_bootstrap_q3_dif <- function(data, indexes){
+  daily_rate = data %>% 
+    slice(indexes) %>% 
+    group_by(group, date_week) %>% 
+    summarize(
+      zero_rate = (sum(n_results==0) / sum(n_results>=0)) * 100
+    )
+  
+  mean_rate_a = daily_rate %>% 
+    filter(group == "a") %>% 
+    summarize(
+      mean_rate = mean(zero_rate)
+    ) %>% 
+    pull (mean_rate)
+    
+  mean_rate_b = daily_rate %>% 
+    filter(group == "b") %>% 
+    summarize(
+      mean_rate = mean(zero_rate)
+    ) %>% 
+    pull (mean_rate)
+  
+  return(
+    mean(mean_rate_a - mean_rate_b)
+  )
+}
+
+bootstraps_q3 <- boot(data = events_q3bdif, 
+                   statistic = funcao_bootstrap_q3_dif, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q3$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q3$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q3$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q3$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q3, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que a média da taxa de pesquisas sem resultado diária no grupo A não é significativamente distinguível em relação à mesma medida do grupo B, tendo em vista que a diferença oscila entre -0.6554 ponto percentual (observar que trata-se de um limite inferior negativo) e +0,2904 ponto percentual (positivo). Portanto, a hipótese de desse valores serem iguais nos dois grupos é plausível e não pode ser descartada.
+
+# Criando uma comparação A/A na pergunta 1
+
+
+```{r}
+events_q1aa = events %>% 
+    group_by(group, date_week, session_id, search_index) %>% 
+    mutate(click_count = max(visit_index)) %>% 
+    subset(action == "searchResultPage" & group == "a", select = c("group", "date_week", "click_count"))
+
+#Gerando os índices da amostra A0 e da amostra A1
+
+  indexes_a = vector(mode = "integer", nrow(events_q1aa))
+  indexes_a[sample(1:nrow(events_q1aa), size = trunc(nrow(events_q1aa)/2), replace = FALSE)] = 1
+  indexes_a0 = which(indexes_a == 0)
+  indexes_a1 = which(indexes_a == 1)
+
+#Renomeando o grupo A para virar A0 e A1
+events_q1aa$group[indexes_a0] = "a0"
+events_q1aa$group[indexes_a1] = "a1"
+
+funcao_bootstrap_q1_aa <- function(data, indexes){
+  daily_rate = data %>% 
+    slice(indexes) %>% 
+    group_by(group, date_week) %>% 
+    summarize(
+      clickthrough_rate = (sum(click_count>0) / sum(click_count>=0)) * 100
+    )
+  mean_rate_a0 = daily_rate %>% 
+    filter(group == "a0") %>% 
+    summarize(
+      mean_rate = mean(clickthrough_rate)
+    ) %>% 
+    pull (mean_rate)
+    
+  mean_rate_a1 = daily_rate %>% 
+    filter(group == "a1") %>% 
+    summarize(
+      mean_rate = mean(clickthrough_rate)
+    ) %>% 
+    pull (mean_rate)
+  
+  return(
+    mean(mean_rate_a0 - mean_rate_a1)
+  )
+}
+
+bootstraps_q1aa <- boot(data = events_q1aa, 
+                   statistic = funcao_bootstrap_q1_aa, # <- referência para a função 
+                   R = 1000) # número de bootstraps
+
+glimpse(bootstraps_q1aa$t)
+```
+
+Vamos ver como ficou a distribuição amostral do parâmetro populacional estimado via bootstrap. Estão marcadas no histograma duas linhas verticais para os quantis 2,5% e 97,5%.
+
+```{r}
+tibble(parametro = as.double(bootstraps_q1aa$t)) %>% 
+  ggplot(aes(x = parametro)) + 
+  geom_histogram(binwidth = 0.1, fill = "white", color = "blue")+
+  geom_vline(xintercept = quantile(bootstraps_q1aa$t, 0.025)[[1]]) + 
+  geom_vline(xintercept = quantile(bootstraps_q1aa$t, 0.975)[[1]])
+```
+
+Agora sim, vamos solicitar o cálculo dos intervalos de confiança que contém o parâmetro calculado em 95% das vezes que esse cálculo for realizado.
+
+```{r}
+boot.ci(boot.out = bootstraps_q1aa, conf = 0.95, type = "basic")
+```
+Portanto, baseado nesse bootstrap, podemos afirmar com 95% de confiança que a média da taxa de cliques diária dentro do próprio grupo A não apresenta diferença significativa.

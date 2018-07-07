@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1530986647783.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "5A378C72",
+    "lastKnownWriteTime" : 1530998075,
+    "last_content_update" : 1530998075783,
+    "path" : "C:/Users/ferna/GitHub/fpcc2_final_task/analysis/final-task.Rmd",
+    "project_path" : "final-task.Rmd",
+    "properties" : {
+        "cursorPosition" : "44,15",
+        "last_setup_crc32" : "",
+        "scrollLine" : "35"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
