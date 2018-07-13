@@ -39,99 +39,153 @@ bugs = read_csv("../ComparativeStudy/stats.csv")
 
 ```{r warning=FALSE}
 bugs2 <- bugs %>% 
-  select(alg_one_enabled, alg_one_disabled, alg_all_enabled_disabled, alg_pair_wise) %>% 
-  summarize(alg_one_enabled = sum(alg_one_enabled),
-            alg_one_disabled = sum(alg_one_disabled),
-            alg_all_enabled_disabled = sum(alg_all_enabled_disabled),
-            alg_pair_wise = sum(alg_pair_wise)) %>% 
+  select(one_enabled, one_disabled, most_enabled_disabled, pair_wise) %>% 
+  summarize(one_enabled = sum(one_enabled),
+            one_disabled = sum(one_disabled),
+            most_enabled_disabled = sum(most_enabled_disabled),
+            pair_wise = sum(pair_wise)) %>% 
   melt(id.vars = NULL) %>% 
   mutate(ci_min = NA, ci_max = NA)
 
+colnames(bugs2)[1] <- "algoritmo"
+colnames(bugs2)[2] <- "acertos"
+
 bugs2 %>% 
-  ggplot(aes(x = variable, y = value)) +
-  geom_bar(stat = "identity", fill="red")  +
+  ggplot(aes(x = algoritmo, y = acertos)) +
+  geom_bar(stat = "identity", fill="lightgreen")  +
   labs(title = "Bugs detectados por cada algoritmo",
        x = "algoritmos", y = "quantidade de bugs")
 ```
 
 
-## Analisando a média de taxa de cliques diária geral (sem distinção de grupos)
+## Realizando bootstrap para estimar os intervalos de confiança na população para algoritmos individualmente
 
 ```{r}
-
-fbs_general <- function(data, indexes, algorithm_colname){
-  res = data %>% 
-    slice(indexes) %>% 
-    subset(select = c(algorithm_colname))
-  return(sum(res))
+gen_cis_individual <- function(alg){
+  
+  fbs_general_individual <- function(data, indexes, algorithm_colname){
+    res = data %>% 
+      slice(indexes) %>% 
+      subset(select = c(algorithm_colname))
+    return(sum(res))
+  }
+  
+  fbs <- function(data, indexes){
+    return(fbs_general_individual(data, indexes, alg))
+  }
+  
+  bs <- boot(data = bugs, statistic = fbs, R = 2000)
+  
+  return(boot.ci(boot.out = bs, conf = 0.95, type = "basic"))
 }
 
 ## One-Enabled
-funcao_bootstrap_one_enabled <- function(data, indexes){
-  return(fbs_general(data, indexes, "alg_one_enabled"))
-}
 
-bootstraps_one_enabled <- boot(data = bugs, 
-                   statistic = funcao_bootstrap_one_enabled,
-                   R = 2000)
-
-ci_one_enabled = boot.ci(boot.out = bootstraps_one_enabled, conf = 0.95, type = "basic")
-
-bugs2[1, 3] = as.integer(round(ci_one_enabled$basic[4]))
-bugs2[1, 4] = as.integer(round(ci_one_enabled$basic[5]))
+ci_temp = gen_cis_individual("one_enabled")
+bugs2[1, 3] = as.integer(round(ci_temp$basic[4]))
+bugs2[1, 4] = as.integer(round(ci_temp$basic[5]))
 
 ## One-Disabled
-funcao_bootstrap_one_disabled <- function(data, indexes){
-  return(fbs_general(data, indexes, "alg_one_disabled"))
-}
+ci_temp = gen_cis_individual("one_disabled")
+bugs2[2, 3] = as.integer(round(ci_temp
+                               $basic[4]))
+bugs2[2, 4] = as.integer(round(ci_temp
+                               $basic[5]))
 
-bootstraps_one_disabled <- boot(data = bugs, 
-                   statistic = funcao_bootstrap_one_disabled,
-                   R = 2000)
-
-ci_one_disabled = boot.ci(boot.out = bootstraps_one_disabled, conf = 0.95, type = "basic")
-
-bugs2[2, 3] = as.integer(round(ci_one_disabled$basic[4]))
-bugs2[2, 4] = as.integer(round(ci_one_disabled$basic[5]))
-
-
-## All-Enabled-Disabled
-funcao_bootstrap_all_enabled_disabled <- function(data, indexes){
-  return(fbs_general(data, indexes, "alg_all_enabled_disabled"))
-}
-
-bootstraps_all_enabled_disabled <- boot(data = bugs, 
-                   statistic = funcao_bootstrap_all_enabled_disabled,
-                   R = 2000)
-
-ci_all_enabled_disabled = boot.ci(boot.out = bootstraps_all_enabled_disabled, conf = 0.95, type = "basic")
-
-bugs2[3, 3] = as.integer(round(ci_all_enabled_disabled$basic[4]))
-bugs2[3, 4] = as.integer(round(ci_all_enabled_disabled$basic[5]))
-
+## Most-Enabled-Disabled
+ci_temp = gen_cis_individual("most_enabled_disabled")
+bugs2[3, 3] = as.integer(round(ci_temp$basic[4]))
+bugs2[3, 4] = as.integer(round(ci_temp$basic[5]))
 
 ## Pair-Wise
-funcao_bootstrap_pair_wise <- function(data, indexes){
-  return(fbs_general(data, indexes, "alg_pair_wise"))
-}
+ci_temp = gen_cis_individual("pair_wise")
+bugs2[4, 3] = as.integer(round(ci_temp$basic[4]))
+bugs2[4, 4] = as.integer(round(ci_temp$basic[5]))
 
-bootstraps_pair_wise <- boot(data = bugs, 
-                   statistic = funcao_bootstrap_pair_wise,
-                   R = 2000)
-
-ci_pair_wise = boot.ci(boot.out = bootstraps_pair_wise, conf = 0.95, type = "basic")
-
-bugs2[4, 3] = as.integer(round(ci_pair_wise$basic[4]))
-bugs2[4, 4] = as.integer(round(ci_pair_wise$basic[5]))
-
-
+## Ploting results
 bugs2 %>% 
-  ggplot(aes(x = variable, y = value)) +
-  geom_bar(stat = "identity", fill="pink")  +
+  ggplot(aes(x = reorder(algoritmo, -acertos), y = acertos)) +
+  geom_bar(stat = "identity", fill="lightgreen", width=0.5)  +
+  coord_flip() +
   geom_errorbar(aes(ymin = ci_min,
                     ymax = ci_max), 
-                width = 0.4, 
-                position = position_dodge(width = 0.8)) +
-  labs(title = "Bugs detectados por cada algoritmo",
-       x = "algoritmos", y = "quantidade de bugs")
+                width = 0.15, 
+                position = position_dodge(width = 0.5)) +
+  labs(title = "Bugs detectados pelos algoritmos",
+       x = "algoritmos", y = "quantidade de bugs", fill = "Algoritmos") +
+  geom_text(aes(label=sprintf("%d", acertos), hjust=0.5, vjust=-1.6)) +
+  theme(axis.text.y = element_text(angle=45, hjust=1))
+```
+
+## Realizando bootstrap para estimar os intervalos de confiança na população para algoritmos individualmente
+
+```{r}
+cis_difference <- data.frame(alg1= character(6), alg2= character(6), ci_min= integer(6), ci_max = integer(6), stringsAsFactors = FALSE)
+
+gen_cis_pair <- function(alg1, alg2) {
+
+fbs_pair_general <- function(data, indexes, algorithm_colname1, algorithm_colname2){
+  res1 = data %>% 
+    slice(indexes) %>% 
+    subset(select = c(algorithm_colname1))
+  res2 = data %>% 
+    slice(indexes) %>% 
+    subset(select = c(algorithm_colname2))
+  return(sum(res1)-sum(res2))
+}
+
+fbs_pair <- function(data, indexes){
+  return(fbs_pair_general(data, indexes, alg1, alg2))
+}
+
+bs_pair <- boot(data = bugs, statistic = fbs_pair, R = 2000)
+
+return(boot.ci(boot.out = bs_pair, conf = 0.95, type = "basic"))
+
+}
+
+## One-Enabled vs One-Disabled
+ci_temp = gen_cis_pair("one_enabled", "one_disabled")
+cis_difference[1, 1] = "one_enabled"
+cis_difference[1, 2] = "one_disabled"
+cis_difference[1, 3] = as.integer(round(ci_temp$basic[4]))
+cis_difference[1, 4] = as.integer(round(ci_temp$basic[5]))
+
+## One-Enabled vs Most-Enabled-Disabled
+ci_temp = gen_cis_pair("one_enabled", "most_enabled_disabled")
+cis_difference[2, 1] = "one_enabled"
+cis_difference[2, 2] = "most_enabled_disabled"
+cis_difference[2, 3] = as.integer(round(ci_temp$basic[4]))
+cis_difference[2, 4] = as.integer(round(ci_temp$basic[5]))
+
+## One-Disabled vs Most-Enabled-Disabled
+ci_temp = gen_cis_pair("one_disabled", "most_enabled_disabled")
+cis_difference[3, 1] = "one_disabled"
+cis_difference[3, 2] = "most_enabled_disabled"
+cis_difference[3, 3] = as.integer(round(ci_temp$basic[4]))
+cis_difference[3, 4] = as.integer(round(ci_temp$basic[5]))
+
+## One-Enabled vs Pair-Wise
+ci_temp = gen_cis_pair("pair_wise", "one_enabled")
+cis_difference[4, 1] = "pair_wise"
+cis_difference[4, 2] = "one_enabled"
+cis_difference[4, 3] = as.integer(round(ci_temp$basic[4]))
+cis_difference[4, 4] = as.integer(round(ci_temp$basic[5]))
+
+## One-Disabled vs Pair-Wise
+ci_temp = gen_cis_pair("pair_wise", "one_disabled")
+cis_difference[5, 1] = "pair_wise"
+cis_difference[5, 2] = "one_disabled"
+cis_difference[5, 3] = as.integer(round(ci_temp$basic[4]))
+cis_difference[5, 4] = as.integer(round(ci_temp$basic[5]))
+
+## Most-Enabled-Disabled
+ci_temp = gen_cis_pair("pair_wise", "most_enabled_disabled")
+cis_difference[6, 1] = "pair_wise"
+cis_difference[6, 2] = "most_enabled_disabled"
+cis_difference[6, 3] = as.integer(round(ci_temp$basic[4]))
+cis_difference[6, 4] = as.integer(round(ci_temp$basic[5]))
+
+## Plotando
+
 ```
